@@ -105,7 +105,9 @@ struct FoodRegisterView: View {
         if let image = selectedImage, let imageData = image.jpegData(compressionQuality: 0.8) {
             data["imageUrl"] = imageData.base64EncodedString()
         }
-        db.collection("foods").addDocument(data: data)
+        let ref = db.collection("foods").addDocument(data: data)
+        let newFood = Food(id: ref.documentID, name: foodName, imageUrl: data["imageUrl"] as? String ?? "", expireDate: date)
+        NotificationManager.shared.scheduleNotification(for: newFood)
         foodName = ""
         expireText = ""
         selectedImage = nil

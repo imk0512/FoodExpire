@@ -1,9 +1,15 @@
 import SwiftUI
 
 struct ContentView: View {
+    @EnvironmentObject private var notificationManager: NotificationManager
+
     var body: some View {
         FoodListView()
-        FoodRegisterView()
+            .sheet(item: $notificationManager.selectedFood) { food in
+                NavigationStack {
+                    FoodDetailView(food: food)
+                }
+            }
     }
 }
 
