@@ -1,6 +1,9 @@
 # FoodExpire
 
 SwiftUI app for managing food expiration dates using OCR.
+The main screen allows registering a food item by taking a photo or selecting
+one from the library. Text recognition automatically fills the food name and
+expiration date which can be edited before saving to Firestore.
 
 ## Features
 - Capture or select photos and recognize text using ML Kit OCR.
