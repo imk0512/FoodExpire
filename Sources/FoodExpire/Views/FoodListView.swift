@@ -9,14 +9,25 @@ struct FoodListView: View {
 
     var body: some View {
         NavigationStack {
-            List(viewModel.foods) { food in
-                NavigationLink {
-                    FoodDetailView(food: food)
-                } label: {
-                    FoodCardView(food: food)
+            VStack {
+                Picker("保存場所", selection: $viewModel.filter) {
+                    Text("すべて").tag(StorageType?.none)
+                    ForEach(StorageType.allCases) { type in
+                        Text(type.rawValue).tag(Optional(type))
+                    }
                 }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+
+                List(viewModel.filteredFoods) { food in
+                    NavigationLink {
+                        FoodDetailView(food: food)
+                    } label: {
+                        FoodCardView(food: food)
+                    }
+                }
+                .listStyle(.plain)
             }
-            .listStyle(.plain)
             .navigationTitle("食品一覧")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

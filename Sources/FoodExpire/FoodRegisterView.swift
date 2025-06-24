@@ -12,6 +12,7 @@ struct FoodRegisterView: View {
     @State private var selectedImage: UIImage?
     @State private var foodName: String = ""
     @State private var expireText: String = ""
+    @State private var storageType: StorageType = .冷蔵
     @State private var showNameAlert = false
     @State private var showDateAlert = false
     @State private var showSavedAlert = false
@@ -47,6 +48,13 @@ struct FoodRegisterView: View {
                 TextField("賞味期限(YYYY/MM/DD)", text: $expireText)
                     .textFieldStyle(.roundedBorder)
                     .keyboardType(.numbersAndPunctuation)
+
+                Picker("保存場所", selection: $storageType) {
+                    ForEach(StorageType.allCases) { type in
+                        Text(type.rawValue).tag(type)
+                    }
+                }
+                .pickerStyle(.segmented)
 
                 Button("保存") {
                     saveFood()
@@ -144,7 +152,8 @@ struct FoodRegisterView: View {
             "name": foodName,
             "expireDate": Timestamp(date: date),
             "createdAt": Timestamp(date: Date()),
-            "updatedAt": Timestamp(date: Date())
+            "updatedAt": Timestamp(date: Date()),
+            "storageType": storageType.rawValue
         ]
         if let image = selectedImage, let imageData = image.jpegData(compressionQuality: 0.8) {
             data["imageUrl"] = imageData.base64EncodedString()
@@ -154,11 +163,12 @@ struct FoodRegisterView: View {
                 showSaveErrorAlert = true
                 return
             }
-            let newFood = Food(id: ref.documentID, name: foodName, imageUrl: data["imageUrl"] as? String ?? "", expireDate: date)
+            let newFood = Food(id: ref.documentID, name: foodName, imageUrl: data["imageUrl"] as? String ?? "", expireDate: date, storageType: storageType)
             NotificationManager.shared.scheduleNotification(for: newFood)
             foodName = ""
             expireText = ""
             selectedImage = nil
+            storageType = .冷蔵
             showSavedAlert = true
         }
     }

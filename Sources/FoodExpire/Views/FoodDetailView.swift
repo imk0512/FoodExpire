@@ -33,6 +33,13 @@ struct FoodDetailView: View {
                 DatePicker("賞味期限", selection: $viewModel.food.expireDate, displayedComponents: .date)
                     .datePickerStyle(.compact)
 
+                Picker("保存場所", selection: $viewModel.food.storageType) {
+                    ForEach(StorageType.allCases) { type in
+                        Text(type.rawValue).tag(type)
+                    }
+                }
+                .pickerStyle(.segmented)
+
                 Button("更新") {
                     let trimmed = viewModel.food.name.trimmingCharacters(in: .whitespaces)
                     if trimmed.isEmpty {
@@ -94,6 +101,6 @@ struct FoodDetailView: View {
 }
 
 #Preview {
-    FoodDetailView(food: Food(id: "1", name: "Sample", imageUrl: "", expireDate: Date()))
+    FoodDetailView(food: Food(id: "1", name: "Sample", imageUrl: "", expireDate: Date(), storageType: .冷蔵))
         .environmentObject(UserSettings())
 }

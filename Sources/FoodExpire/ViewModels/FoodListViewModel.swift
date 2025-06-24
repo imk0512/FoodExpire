@@ -6,6 +6,12 @@ import FirebaseFirestoreSwift
 class FoodListViewModel: ObservableObject {
     @Published var foods: [Food] = []
     @Published var fetchError: Bool = false
+    @Published var filter: StorageType? = nil
+
+    var filteredFoods: [Food] {
+        guard let filter = filter else { return foods }
+        return foods.filter { $0.storageType == filter }
+    }
 
     func fetchFoods() {
         Firestore.firestore()

@@ -14,7 +14,8 @@ class FoodDetailViewModel: ObservableObject {
         let data: [String: Any] = [
             "name": food.name,
             "expireDate": Timestamp(date: food.expireDate),
-            "updatedAt": Timestamp(date: Date())
+            "updatedAt": Timestamp(date: Date()),
+            "storageType": food.storageType.rawValue
         ]
         Firestore.firestore().collection("foods").document(id).updateData(data) { error in
             if error == nil {

@@ -34,8 +34,16 @@ struct FoodCardView: View {
                     .font(.headline)
                 Text(dateString)
                     .font(.subheadline)
-                Text("残り\(remainingDays)日")
-                    .font(.caption)
+                HStack {
+                    Text("残り\(remainingDays)日")
+                        .font(.caption)
+                    Spacer()
+                    Text(food.storageType.rawValue)
+                        .font(.caption2)
+                        .padding(4)
+                        .background(Color.gray.opacity(0.2))
+                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                }
             }
             Spacer()
         }
@@ -50,6 +58,6 @@ struct FoodCardView: View {
 }
 
 #Preview {
-    FoodCardView(food: Food(id: "1", name: "Sample", imageUrl: "", expireDate: Date().addingTimeInterval(86400*5)))
+    FoodCardView(food: Food(id: "1", name: "Sample", imageUrl: "", expireDate: Date().addingTimeInterval(86400*5), storageType: .冷蔵))
 }
 
