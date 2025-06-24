@@ -4,6 +4,10 @@ struct FoodDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: FoodDetailViewModel
     @State private var showDeleteAlert = false
+    @State private var showNameAlert = false
+    @State private var showDateAlert = false
+    @State private var showUpdatedAlert = false
+    @State private var showDeletedAlert = false
     @EnvironmentObject private var userSettings: UserSettings
 
     init(food: Food) {
@@ -27,8 +31,14 @@ struct FoodDetailView: View {
                     .datePickerStyle(.compact)
 
                 Button("更新") {
-                    viewModel.updateFood()
-                    dismiss()
+                    if viewModel.food.name.trimmingCharacters(in: .whitespaces).isEmpty {
+                        showNameAlert = true
+                    } else if Calendar.current.startOfDay(for: viewModel.food.expireDate) < Calendar.current.startOfDay(for: Date()) {
+                        showDateAlert = true
+                    } else {
+                        viewModel.updateFood()
+                        showUpdatedAlert = true
+                    }
                 }
                 .buttonStyle(.borderedProminent)
 
@@ -40,10 +50,13 @@ struct FoodDetailView: View {
                     Button("キャンセル", role: .cancel) {}
                     Button("削除", role: .destructive) {
                         viewModel.deleteFood()
-                        dismiss()
+                        showDeletedAlert = true
                     }
                 } message: {
                     Text("この食品を削除します")
+                }
+                .alert("削除しました", isPresented: $showDeletedAlert) {
+                    Button("OK") { dismiss() }
                 }
             }
             .padding()
@@ -55,6 +68,9 @@ struct FoodDetailView: View {
                     .frame(height: 50)
             }
         }
+        .alert("食品名を入力してください", isPresented: $showNameAlert) {}
+        .alert("賞味期限が過去の日付です", isPresented: $showDateAlert) {}
+        .alert("更新しました", isPresented: $showUpdatedAlert) { Button("OK") { dismiss() } }
     }
 }
 
