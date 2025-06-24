@@ -6,6 +6,7 @@ struct FoodDetailView: View {
     @State private var showDeleteAlert = false
     @State private var showNameAlert = false
     @State private var showDateAlert = false
+    @State private var showLengthAlert = false
     @State private var showUpdatedAlert = false
     @State private var showDeletedAlert = false
     @State private var showUpdateErrorAlert = false
@@ -33,8 +34,11 @@ struct FoodDetailView: View {
                     .datePickerStyle(.compact)
 
                 Button("更新") {
-                    if viewModel.food.name.trimmingCharacters(in: .whitespaces).isEmpty {
+                    let trimmed = viewModel.food.name.trimmingCharacters(in: .whitespaces)
+                    if trimmed.isEmpty {
                         showNameAlert = true
+                    } else if trimmed.count > AppConstants.maxFoodNameLength {
+                        showLengthAlert = true
                     } else if Calendar.current.startOfDay(for: viewModel.food.expireDate) < Calendar.current.startOfDay(for: Date()) {
                         showDateAlert = true
                     } else {
@@ -81,6 +85,7 @@ struct FoodDetailView: View {
             }
         }
         .alert("食品名を入力してください", isPresented: $showNameAlert) {}
+        .alert(NSLocalizedString("NameTooLong", comment: ""), isPresented: $showLengthAlert) {}
         .alert("賞味期限が過去の日付です", isPresented: $showDateAlert) {}
         .alert("更新しました", isPresented: $showUpdatedAlert) { Button("OK") { dismiss() } }
         .alert("更新に失敗しました", isPresented: $showUpdateErrorAlert) {}

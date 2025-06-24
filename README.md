@@ -5,6 +5,8 @@ The main screen allows registering a food item by taking a photo or selecting
 one from the library. Text recognition automatically fills the food name and
 expiration date which can be edited before saving to Firestore.
 
+The app supports both Japanese and English localizations.
+
 ## Features
 - Capture or select photos and recognize text using ML Kit OCR.
 - Save food items with expiration dates to Firestore.

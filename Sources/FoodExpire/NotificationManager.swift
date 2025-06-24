@@ -45,8 +45,8 @@ final class NotificationManager: NSObject, ObservableObject, UNUserNotificationC
     func reloadSchedule() {
         let center = UNUserNotificationCenter.current()
         center.removeAllPendingNotificationRequests()
-        Firestore.firestore().collection("foods").getDocuments { snapshot, _ in
-            guard let documents = snapshot?.documents else { return }
+        Firestore.firestore().collection("foods").getDocuments { snapshot, error in
+            guard error == nil, let documents = snapshot?.documents else { return }
             for doc in documents {
                 if let food = try? doc.data(as: Food.self) {
                     self.scheduleNotification(for: food)
