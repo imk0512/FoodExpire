@@ -6,7 +6,7 @@ import AVFoundation
 import UIKit
 
 struct FoodRegisterView: View {
-    private let maxNameLength = 30
+    private let maxNameLength = AppConstants.maxFoodNameLength
     @State private var showPhotoPicker = false
     @State private var showCameraPicker = false
     @State private var selectedImage: UIImage?
@@ -75,7 +75,7 @@ struct FoodRegisterView: View {
                 Button("設定を開く") { openSettings() }
                 Button("OK", role: .cancel) {}
             }
-            .alert("食品名が長すぎます", isPresented: $showLengthAlert) {}
+            .alert(NSLocalizedString("NameTooLong", comment: ""), isPresented: $showLengthAlert) {}
         }
     }
 
@@ -150,8 +150,7 @@ struct FoodRegisterView: View {
             data["imageUrl"] = imageData.base64EncodedString()
         }
         let ref = db.collection("foods").addDocument(data: data) { error in
-            if let error = error {
-                print("save error: \(error)")
+            if error != nil {
                 showSaveErrorAlert = true
                 return
             }

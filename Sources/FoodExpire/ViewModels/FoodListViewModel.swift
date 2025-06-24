@@ -12,8 +12,7 @@ class FoodListViewModel: ObservableObject {
             .collection("foods")
             .order(by: "expireDate")
             .addSnapshotListener { [weak self] snapshot, error in
-                if let error = error {
-                    print("fetch error: \(error)")
+                if error != nil {
                     self?.fetchError = true
                     return
                 }
