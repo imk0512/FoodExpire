@@ -14,6 +14,11 @@ struct SettingsView: View {
                 Toggle("通知オン", isOn: $notificationManager.notificationsEnabled)
             }
             Section {
+                NavigationLink("買い物リスト") {
+                    ShoppingListView()
+                }
+            }
+            Section {
                 if userSettings.isPremium {
                     HStack {
                         Image(systemName: "checkmark.seal.fill")
