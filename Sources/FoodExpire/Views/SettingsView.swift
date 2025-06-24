@@ -1,9 +1,12 @@
 import SwiftUI
+import UIKit
 
 struct SettingsView: View {
     @EnvironmentObject private var userSettings: UserSettings
     @EnvironmentObject private var notificationManager: NotificationManager
     @State private var processing = false
+    @State private var showPurchaseErrorAlert = false
+    @State private var showRestoreErrorAlert = false
 
     var body: some View {
         Form {
@@ -37,20 +40,40 @@ struct SettingsView: View {
         }
         .navigationTitle("設定")
         .disabled(processing)
+        .alert("購入に失敗しました", isPresented: $showPurchaseErrorAlert) {}
+        .alert("復元に失敗しました", isPresented: $showRestoreErrorAlert) {}
+        .alert("通知が許可されていません。設定から許可してください", isPresented: $notificationManager.showSettingsAlert) {
+            Button("設定を開く") { openSettings() }
+            Button("OK", role: .cancel) {}
+        }
     }
 
     private func purchase() async {
         processing = true
         let success = await InAppPurchaseManager.purchaseRemoveAds()
         processing = false
-        if success { userSettings.isPremium = true }
+        if success {
+            userSettings.isPremium = true
+        } else {
+            showPurchaseErrorAlert = true
+        }
     }
 
     private func restore() async {
         processing = true
         let success = await InAppPurchaseManager.restorePurchases()
         processing = false
-        if success { userSettings.isPremium = true }
+        if success {
+            userSettings.isPremium = true
+        } else {
+            showRestoreErrorAlert = true
+        }
+    }
+
+    private func openSettings() {
+        if let url = URL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(url)
+        }
     }
 }
 

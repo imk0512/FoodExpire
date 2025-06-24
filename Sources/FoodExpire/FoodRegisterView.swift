@@ -2,8 +2,11 @@ import SwiftUI
 import PhotosUI
 import FirebaseFirestore
 import MLKit
+import AVFoundation
+import UIKit
 
 struct FoodRegisterView: View {
+    private let maxNameLength = 30
     @State private var showPhotoPicker = false
     @State private var showCameraPicker = false
     @State private var selectedImage: UIImage?
@@ -12,17 +15,22 @@ struct FoodRegisterView: View {
     @State private var showNameAlert = false
     @State private var showDateAlert = false
     @State private var showSavedAlert = false
+    @State private var showSaveErrorAlert = false
+    @State private var showOCRAlert = false
+    @State private var showCameraPermissionAlert = false
+    @State private var showPhotoPermissionAlert = false
+    @State private var showLengthAlert = false
 
     var body: some View {
         NavigationView {
             VStack(spacing: 16) {
                 HStack {
                     Button("写真撮影") {
-                        showCameraPicker = true
+                        checkCameraPermission()
                     }
                     .padding()
                     Button("写真選択") {
-                        showPhotoPicker = true
+                        checkPhotoPermission()
                     }
                     .padding()
                 }
@@ -57,6 +65,17 @@ struct FoodRegisterView: View {
             .alert("食品名を入力してください", isPresented: $showNameAlert) {}
             .alert("賞味期限が過去の日付です", isPresented: $showDateAlert) {}
             .alert("保存しました", isPresented: $showSavedAlert) {}
+            .alert("保存に失敗しました", isPresented: $showSaveErrorAlert) {}
+            .alert("文字認識に失敗しました。手入力してください", isPresented: $showOCRAlert) {}
+            .alert("カメラのアクセスが許可されていません。設定から許可してください", isPresented: $showCameraPermissionAlert) {
+                Button("設定を開く") { openSettings() }
+                Button("OK", role: .cancel) {}
+            }
+            .alert("写真へのアクセスが許可されていません。設定から許可してください", isPresented: $showPhotoPermissionAlert) {
+                Button("設定を開く") { openSettings() }
+                Button("OK", role: .cancel) {}
+            }
+            .alert("食品名が長すぎます", isPresented: $showLengthAlert) {}
         }
     }
 
@@ -65,7 +84,10 @@ struct FoodRegisterView: View {
         let visionImage = VisionImage(image: image)
         let textRecognizer = TextRecognizer.textRecognizer()
         textRecognizer.process(visionImage) { result, error in
-            guard let result = result, error == nil else { return }
+            guard let result = result, error == nil else {
+                showOCRAlert = true
+                return
+            }
             let text = result.text
             if foodName.isEmpty {
                 foodName = parseFoodName(from: text)
@@ -100,8 +122,13 @@ struct FoodRegisterView: View {
     }
 
     private func saveFood() {
-        guard !foodName.trimmingCharacters(in: .whitespaces).isEmpty else {
+        let trimmed = foodName.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else {
             showNameAlert = true
+            return
+        }
+        guard trimmed.count <= maxNameLength else {
+            showLengthAlert = true
             return
         }
         guard let date = dateFromString(expireText) else {
@@ -122,17 +149,60 @@ struct FoodRegisterView: View {
         if let image = selectedImage, let imageData = image.jpegData(compressionQuality: 0.8) {
             data["imageUrl"] = imageData.base64EncodedString()
         }
-        let ref = db.collection("foods").addDocument(data: data)
-        let newFood = Food(id: ref.documentID, name: foodName, imageUrl: data["imageUrl"] as? String ?? "", expireDate: date)
-        NotificationManager.shared.scheduleNotification(for: newFood)
-        foodName = ""
-        expireText = ""
-        selectedImage = nil
-        showSavedAlert = true
+        let ref = db.collection("foods").addDocument(data: data) { error in
+            if let error = error {
+                print("save error: \(error)")
+                showSaveErrorAlert = true
+                return
+            }
+            let newFood = Food(id: ref.documentID, name: foodName, imageUrl: data["imageUrl"] as? String ?? "", expireDate: date)
+            NotificationManager.shared.scheduleNotification(for: newFood)
+            foodName = ""
+            expireText = ""
+            selectedImage = nil
+            showSavedAlert = true
+        }
     }
 
     private func dateFromString(_ str: String) -> Date? {
         DateFormatter.expireFormatter.date(from: str)
+    }
+
+    private func checkCameraPermission() {
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized:
+            showCameraPicker = true
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: .video) { granted in
+                if granted { showCameraPicker = true } else { showCameraPermissionAlert = true }
+            }
+        default:
+            showCameraPermissionAlert = true
+        }
+    }
+
+    private func checkPhotoPermission() {
+        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+        switch status {
+        case .authorized, .limited:
+            showPhotoPicker = true
+        case .notDetermined:
+            PHPhotoLibrary.requestAuthorization(for: .readWrite) { newStatus in
+                if newStatus == .authorized || newStatus == .limited {
+                    showPhotoPicker = true
+                } else {
+                    showPhotoPermissionAlert = true
+                }
+            }
+        default:
+            showPhotoPermissionAlert = true
+        }
+    }
+
+    private func openSettings() {
+        if let url = URL(string: UIApplication.openSettingsURLString) {
+            UIApplication.shared.open(url)
+        }
     }
 }
 

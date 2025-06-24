@@ -8,6 +8,8 @@ struct FoodDetailView: View {
     @State private var showDateAlert = false
     @State private var showUpdatedAlert = false
     @State private var showDeletedAlert = false
+    @State private var showUpdateErrorAlert = false
+    @State private var showDeleteErrorAlert = false
     @EnvironmentObject private var userSettings: UserSettings
 
     init(food: Food) {
@@ -36,8 +38,13 @@ struct FoodDetailView: View {
                     } else if Calendar.current.startOfDay(for: viewModel.food.expireDate) < Calendar.current.startOfDay(for: Date()) {
                         showDateAlert = true
                     } else {
-                        viewModel.updateFood()
-                        showUpdatedAlert = true
+                        viewModel.updateFood { error in
+                            if error != nil {
+                                showUpdateErrorAlert = true
+                            } else {
+                                showUpdatedAlert = true
+                            }
+                        }
                     }
                 }
                 .buttonStyle(.borderedProminent)
@@ -49,8 +56,13 @@ struct FoodDetailView: View {
                 .alert("削除してもよろしいですか？", isPresented: $showDeleteAlert) {
                     Button("キャンセル", role: .cancel) {}
                     Button("削除", role: .destructive) {
-                        viewModel.deleteFood()
-                        showDeletedAlert = true
+                        viewModel.deleteFood { error in
+                            if error != nil {
+                                showDeleteErrorAlert = true
+                            } else {
+                                showDeletedAlert = true
+                            }
+                        }
                     }
                 } message: {
                     Text("この食品を削除します")
@@ -71,6 +83,8 @@ struct FoodDetailView: View {
         .alert("食品名を入力してください", isPresented: $showNameAlert) {}
         .alert("賞味期限が過去の日付です", isPresented: $showDateAlert) {}
         .alert("更新しました", isPresented: $showUpdatedAlert) { Button("OK") { dismiss() } }
+        .alert("更新に失敗しました", isPresented: $showUpdateErrorAlert) {}
+        .alert("削除に失敗しました", isPresented: $showDeleteErrorAlert) {}
     }
 }
 
