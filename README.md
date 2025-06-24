@@ -14,6 +14,7 @@ The app supports both Japanese and English localizations.
 - Send notifications when items are about to expire.
 - Re-register previously saved foods from the detail screen.
 - Optional in-app purchase to remove banner ads.
+- Suggest simple recipe ideas based on foods nearing expiration.
 
 ## Setup
 1. Open `Package.swift` with Xcode 15 or later.

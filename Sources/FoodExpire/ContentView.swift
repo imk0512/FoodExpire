@@ -9,6 +9,8 @@ struct ContentView: View {
                 .tabItem { Label("食品", systemImage: "list.bullet") }
             NavigationStack { ShoppingListView() }
                 .tabItem { Label("買い物", systemImage: "cart") }
+            NavigationStack { RecipeSuggestionView() }
+                .tabItem { Label("レシピ", systemImage: "lightbulb") }
         }
         .sheet(item: $notificationManager.selectedFood) { food in
             NavigationStack {
