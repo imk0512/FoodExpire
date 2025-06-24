@@ -16,11 +16,15 @@ class FoodDetailViewModel: ObservableObject {
             "expireDate": Timestamp(date: food.expireDate),
             "updatedAt": Timestamp(date: Date())
         ]
-        Firestore.firestore().collection("foods").document(id).updateData(data)
+        Firestore.firestore().collection("foods").document(id).updateData(data) { _ in
+            NotificationManager.shared.scheduleNotification(for: self.food)
+        }
     }
 
     func deleteFood() {
         guard let id = food.id else { return }
-        Firestore.firestore().collection("foods").document(id).delete()
+        Firestore.firestore().collection("foods").document(id).delete { _ in
+            NotificationManager.shared.cancelNotification(for: id)
+        }
     }
 }
