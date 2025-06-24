@@ -8,6 +8,7 @@ final class NotificationManager: NSObject, ObservableObject, UNUserNotificationC
     static let shared = NotificationManager()
 
     @Published var selectedFood: Food?
+    @Published var showSettingsAlert = false
     @Published var notificationsEnabled: Bool {
         didSet {
             UserDefaults.standard.set(notificationsEnabled, forKey: "notificationsEnabled")
@@ -31,6 +32,12 @@ final class NotificationManager: NSObject, ObservableObject, UNUserNotificationC
         center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
             if granted {
                 self.reloadSchedule()
+            }
+            if !granted {
+                DispatchQueue.main.async {
+                    self.notificationsEnabled = false
+                    self.showSettingsAlert = true
+                }
             }
         }
     }

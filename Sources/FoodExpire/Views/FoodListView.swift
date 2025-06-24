@@ -31,6 +31,7 @@ struct FoodListView: View {
                 }
             }
             .onAppear { viewModel.fetchFoods() }
+            .alert("データの取得に失敗しました", isPresented: $viewModel.fetchError) {}
             .sheet(isPresented: $showAdd) {
                 AddFoodView()
             }

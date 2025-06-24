@@ -9,22 +9,28 @@ class FoodDetailViewModel: ObservableObject {
         self.food = food
     }
 
-    func updateFood() {
-        guard let id = food.id else { return }
+    func updateFood(completion: @escaping (Error?) -> Void) {
+        guard let id = food.id else { completion(nil); return }
         let data: [String: Any] = [
             "name": food.name,
             "expireDate": Timestamp(date: food.expireDate),
             "updatedAt": Timestamp(date: Date())
         ]
-        Firestore.firestore().collection("foods").document(id).updateData(data) { _ in
-            NotificationManager.shared.scheduleNotification(for: self.food)
+        Firestore.firestore().collection("foods").document(id).updateData(data) { error in
+            if error == nil {
+                NotificationManager.shared.scheduleNotification(for: self.food)
+            }
+            completion(error)
         }
     }
 
-    func deleteFood() {
-        guard let id = food.id else { return }
-        Firestore.firestore().collection("foods").document(id).delete { _ in
-            NotificationManager.shared.cancelNotification(for: id)
+    func deleteFood(completion: @escaping (Error?) -> Void) {
+        guard let id = food.id else { completion(nil); return }
+        Firestore.firestore().collection("foods").document(id).delete { error in
+            if error == nil {
+                NotificationManager.shared.cancelNotification(for: id)
+            }
+            completion(error)
         }
     }
 }
