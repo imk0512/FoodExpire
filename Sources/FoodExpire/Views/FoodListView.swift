@@ -3,6 +3,7 @@ import SwiftUI
 struct FoodListView: View {
     @StateObject private var viewModel = FoodListViewModel()
     @State private var showAdd = false
+    @EnvironmentObject private var userSettings: UserSettings
 
     var body: some View {
         NavigationStack {
@@ -26,11 +27,18 @@ struct FoodListView: View {
             .sheet(isPresented: $showAdd) {
                 AddFoodView()
             }
+            .safeAreaInset(edge: .bottom) {
+                if !userSettings.isPremium {
+                    BannerAdView()
+                        .frame(height: 50)
+                }
+            }
         }
     }
 }
 
 #Preview {
     FoodListView()
+        .environmentObject(UserSettings())
 }
 

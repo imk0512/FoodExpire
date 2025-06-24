@@ -15,5 +15,7 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .environmentObject(NotificationManager.shared)
+        .environmentObject(UserSettings())
 }
 
