@@ -1,24 +1,23 @@
 # FoodExpire
 
-SwiftUI app for managing food expiration dates using OCR.
-The main screen allows registering a food item by taking a photo or selecting
-one from the library. Text recognition automatically fills the food name and
-expiration date which can be edited before saving to Firestore.
+OCR を使って食品の賞味期限を管理する SwiftUI アプリです。
+メイン画面では写真を撮影するかライブラリから選択して食品を登録できます。
+テキスト認識によって自動で食品名と期限が入力され、保存前に編集することもできます。
 
-The app supports both Japanese and English localizations.
+アプリは日本語と英語のローカライズに対応しています。
 
-## Features
-- Capture or select photos and recognize text using ML Kit OCR.
-- Save food items with expiration dates to Firestore.
-- List saved items sorted by expiration date.
-- Send notifications when items are about to expire.
-- Re-register previously saved foods from the detail screen.
-- Optional in-app purchase to remove banner ads.
-- Suggest simple recipe ideas based on foods nearing expiration.
+## 主な機能
+- ML Kit OCR を利用した写真の撮影・選択とテキスト認識
+- 賞味期限付きで食品を Firestore に保存
+- 賞味期限順に並んだ登録済みアイテムの一覧表示
+- 期限が近づいたら通知を送信
+- 詳細画面から過去に保存した食品を再登録
+- バナー広告を削除するオプションのアプリ内課金
+- 期限が近い食品から簡単なレシピを提案
 
-## Setup
-1. Open `Package.swift` with Xcode 15 or later.
-2. Add your Firebase configuration file `GoogleService-Info.plist` under `Sources/FoodExpire/Resources/`.
-3. Select the `FoodExpire` scheme and run on an iOS 17 simulator or device.
+## セットアップ
+1. Xcode 15 以降で `Package.swift` を開きます
+2. Firebase 設定ファイル `GoogleService-Info.plist` を `Sources/FoodExpire/Resources/` 配下に追加します
+3. `FoodExpire` スキームを選択し、iOS 17 シミュレータまたはデバイスで実行します
 
-Firebase dependencies are resolved via Swift Package Manager. Firestore and ML Kit for text recognition are included.
+Firebase の依存ライブラリは Swift Package Manager で解決されます。Firestore とテキスト認識用 ML Kit が含まれています。
