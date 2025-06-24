@@ -4,6 +4,7 @@ struct FoodDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: FoodDetailViewModel
     @State private var showDeleteAlert = false
+    @EnvironmentObject private var userSettings: UserSettings
 
     init(food: Food) {
         _viewModel = StateObject(wrappedValue: FoodDetailViewModel(food: food))
@@ -48,9 +49,16 @@ struct FoodDetailView: View {
             .padding()
         }
         .navigationTitle("食品詳細")
+        .safeAreaInset(edge: .bottom) {
+            if !userSettings.isPremium {
+                BannerAdView()
+                    .frame(height: 50)
+            }
+        }
     }
 }
 
 #Preview {
     FoodDetailView(food: Food(id: "1", name: "Sample", imageUrl: "", expireDate: Date()))
+        .environmentObject(UserSettings())
 }
