@@ -10,6 +10,7 @@ expiration date which can be edited before saving to Firestore.
 - Save food items with expiration dates to Firestore.
 - List saved items sorted by expiration date.
 - Send notifications when items are about to expire.
+- Optional in-app purchase to remove banner ads.
 
 ## Setup
 1. Open `Package.swift` with Xcode 15 or later.
