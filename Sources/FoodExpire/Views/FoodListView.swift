@@ -5,6 +5,7 @@ struct FoodListView: View {
     @State private var showAdd = false
     @State private var showSettings = false
     @EnvironmentObject private var userSettings: UserSettings
+    @EnvironmentObject private var notificationManager: NotificationManager
 
     var body: some View {
         NavigationStack {
@@ -36,6 +37,7 @@ struct FoodListView: View {
             .sheet(isPresented: $showSettings) {
                 NavigationStack { SettingsView() }
                     .environmentObject(userSettings)
+                    .environmentObject(notificationManager)
             }
             .safeAreaInset(edge: .bottom) {
                 if !userSettings.isPremium {
@@ -50,5 +52,6 @@ struct FoodListView: View {
 #Preview {
     FoodListView()
         .environmentObject(UserSettings())
+        .environmentObject(NotificationManager.shared)
 }
 

@@ -9,6 +9,9 @@ struct FoodRegisterView: View {
     @State private var selectedImage: UIImage?
     @State private var foodName: String = ""
     @State private var expireText: String = ""
+    @State private var showNameAlert = false
+    @State private var showDateAlert = false
+    @State private var showSavedAlert = false
 
     var body: some View {
         NavigationView {
@@ -51,6 +54,9 @@ struct FoodRegisterView: View {
                     processImage(image)
                 }
             }
+            .alert("食品名を入力してください", isPresented: $showNameAlert) {}
+            .alert("賞味期限が過去の日付です", isPresented: $showDateAlert) {}
+            .alert("保存しました", isPresented: $showSavedAlert) {}
         }
     }
 
@@ -94,7 +100,18 @@ struct FoodRegisterView: View {
     }
 
     private func saveFood() {
-        guard let date = dateFromString(expireText) else { return }
+        guard !foodName.trimmingCharacters(in: .whitespaces).isEmpty else {
+            showNameAlert = true
+            return
+        }
+        guard let date = dateFromString(expireText) else {
+            showDateAlert = true
+            return
+        }
+        if Calendar.current.startOfDay(for: date) < Calendar.current.startOfDay(for: Date()) {
+            showDateAlert = true
+            return
+        }
         let db = Firestore.firestore()
         var data: [String: Any] = [
             "name": foodName,
@@ -111,12 +128,11 @@ struct FoodRegisterView: View {
         foodName = ""
         expireText = ""
         selectedImage = nil
+        showSavedAlert = true
     }
 
     private func dateFromString(_ str: String) -> Date? {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd"
-        return formatter.date(from: str)
+        DateFormatter.expireFormatter.date(from: str)
     }
 }
 

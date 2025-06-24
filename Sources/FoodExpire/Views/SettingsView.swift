@@ -2,10 +2,14 @@ import SwiftUI
 
 struct SettingsView: View {
     @EnvironmentObject private var userSettings: UserSettings
+    @EnvironmentObject private var notificationManager: NotificationManager
     @State private var processing = false
 
     var body: some View {
         Form {
+            Section("通知") {
+                Toggle("通知オン", isOn: $notificationManager.notificationsEnabled)
+            }
             Section {
                 if userSettings.isPremium {
                     HStack {
@@ -19,6 +23,15 @@ struct SettingsView: View {
                 }
                 Button("復元") {
                     Task { await restore() }
+                }
+            }
+            Section("アプリについて") {
+                Text("賞味期限を管理するシンプルなアプリです")
+                HStack {
+                    Text("バージョン")
+                    Spacer()
+                    Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "")
+                        .foregroundColor(.secondary)
                 }
             }
         }
@@ -44,4 +57,5 @@ struct SettingsView: View {
 #Preview {
     NavigationStack { SettingsView() }
         .environmentObject(UserSettings())
+        .environmentObject(NotificationManager.shared)
 }

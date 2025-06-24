@@ -45,9 +45,7 @@ struct FoodCardView: View {
     }
 
     private var dateString: String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd"
-        return formatter.string(from: food.expireDate)
+        DateFormatter.expireFormatter.string(from: food.expireDate)
     }
 }
 

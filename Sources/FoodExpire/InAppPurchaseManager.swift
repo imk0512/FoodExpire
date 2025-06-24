@@ -33,7 +33,6 @@ struct InAppPurchaseManager {
                 return false
             }
         } catch {
-            print("Purchase error: \(error)")
             return false
         }
     }
@@ -48,8 +47,24 @@ struct InAppPurchaseManager {
                 }
             }
         } catch {
-            print("Restore error: \(error)")
+            return false
         }
+        return false
+    }
+
+    static func syncPremiumStatus() async -> Bool {
+        do {
+            for await result in Transaction.currentEntitlements {
+                if case .verified(let transaction) = result,
+                   transaction.productID == removeAdsID {
+                    UserDefaults.standard.set(true, forKey: "isPremium")
+                    return true
+                }
+            }
+        } catch {
+            return UserDefaults.standard.bool(forKey: "isPremium")
+        }
+        UserDefaults.standard.set(false, forKey: "isPremium")
         return false
     }
 }

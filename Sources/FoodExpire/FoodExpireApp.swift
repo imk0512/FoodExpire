@@ -11,6 +11,10 @@ struct FoodExpireApp: App {
         FirebaseApp.configure()
         notificationManager.requestAuthorization()
         GADMobileAds.sharedInstance().start(completionHandler: nil)
+        Task {
+            let premium = await InAppPurchaseManager.syncPremiumStatus()
+            await MainActor.run { userSettings.isPremium = premium }
+        }
     }
 
     var body: some Scene {
