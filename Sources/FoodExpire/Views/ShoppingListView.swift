@@ -26,6 +26,7 @@ struct ShoppingListView: View {
             }
         }
         .listStyle(.plain)
+        .padding(.vertical, 8)
         .navigationTitle("買い物リスト")
         .onAppear { viewModel.fetchItems() }
         .alert("データの取得に失敗しました", isPresented: $viewModel.fetchError) {}
@@ -40,6 +41,7 @@ struct ShoppingListView: View {
             .buttonStyle(.plain)
             VStack(alignment: .leading) {
                 Text(item.name)
+                    .bodyFont()
                 Text(DateFormatter.expireFormatter.string(from: item.createdAt))
                     .font(.caption)
                     .foregroundStyle(.secondary)

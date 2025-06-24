@@ -9,6 +9,9 @@ struct FoodCardView: View {
     }
 
     private var color: Color {
+        if remainingDays < 0 {
+            return .red
+        }
         switch remainingDays {
         case ...3:
             return .red
@@ -31,21 +34,39 @@ struct FoodCardView: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(food.name)
-                    .font(.headline)
+                    .titleFont()
                 Text(dateString)
-                    .font(.subheadline)
+                    .bodyFont()
                 Text("残り\(remainingDays)日")
                     .font(.caption)
             }
             Spacer()
         }
         .padding(8)
-        .background(color.opacity(0.2))
+        .background(backgroundColor)
         .clipShape(RoundedRectangle(cornerRadius: 8))
+        .overlay(alignment: .topTrailing) {
+            if let storage = food.storageType, !storage.isEmpty {
+                Text(storage)
+                    .font(.caption2)
+                    .padding(4)
+                    .background(Color.accentColor)
+                    .foregroundStyle(.white)
+                    .clipShape(Capsule())
+                    .padding(4)
+            }
+        }
     }
 
     private var dateString: String {
         DateFormatter.expireFormatter.string(from: food.expireDate)
+    }
+
+    private var backgroundColor: Color {
+        if remainingDays < 0 {
+            return Color.red.opacity(0.2)
+        }
+        return color.opacity(0.2)
     }
 }
 

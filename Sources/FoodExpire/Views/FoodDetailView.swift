@@ -33,9 +33,19 @@ struct FoodDetailView: View {
 
                 TextField("食品名", text: $viewModel.food.name)
                     .textFieldStyle(.roundedBorder)
+                    .bodyFont()
 
                 DatePicker("賞味期限", selection: $viewModel.food.expireDate, displayedComponents: .date)
                     .datePickerStyle(.compact)
+                    .bodyFont()
+
+                Picker("保存場所", selection: Binding(
+                    get: { viewModel.food.storageType ?? "冷蔵" },
+                    set: { viewModel.food.storageType = $0 }
+                )) {
+                    ForEach(["常温", "冷蔵", "冷凍"], id: \.self) { Text($0) }
+                }
+                .pickerStyle(.segmented)
 
                 ZStack(alignment: .topLeading) {
                     if (viewModel.food.note ?? "").isEmpty {
@@ -73,22 +83,22 @@ struct FoodDetailView: View {
                         }
                     }
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(PrimaryButtonStyle())
 
                 Button("再登録") {
                     showReRegister = true
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(PrimaryButtonStyle())
 
                 Button("買い物リストに追加") {
                     addToShoppingList()
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(PrimaryButtonStyle())
 
                 Button("消費済み（削除）", role: .destructive) {
                     showDeleteAlert = true
                 }
-                .buttonStyle(.bordered)
+                .buttonStyle(PrimaryButtonStyle())
                 .alert("削除してもよろしいですか？", isPresented: $showDeleteAlert) {
                     Button("キャンセル", role: .cancel) {}
                     Button("削除", role: .destructive) {
@@ -107,7 +117,7 @@ struct FoodDetailView: View {
                     Button("OK") { dismiss() }
                 }
             }
-            .padding()
+            .padding(.vertical, 8)
         }
         .navigationTitle("食品詳細")
         .safeAreaInset(edge: .bottom) {
@@ -134,7 +144,7 @@ struct FoodDetailView: View {
             "name": viewModel.food.name,
             "createdAt": Timestamp(date: Date()),
             "note": viewModel.food.note ?? "",
-            "storageType": "",
+            "storageType": viewModel.food.storageType ?? "",
             "isChecked": false
         ]
         Firestore.firestore().collection("shoppingList").addDocument(data: data) { error in

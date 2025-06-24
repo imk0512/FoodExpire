@@ -23,20 +23,26 @@ struct SettingsView: View {
                     HStack {
                         Image(systemName: "checkmark.seal.fill")
                         Text("広告非表示購入済み")
+                            .bodyFont()
                     }
                 } else {
                     Button(action: { Task { await purchase() } }) {
                         Text("広告を削除 (¥480)")
+                            .bodyFont()
                     }
+                    .buttonStyle(PrimaryButtonStyle())
                 }
                 Button("復元") {
                     Task { await restore() }
                 }
+                .buttonStyle(PrimaryButtonStyle())
             }
             Section("アプリについて") {
                 Text("賞味期限を管理するシンプルなアプリです")
+                    .bodyFont()
                 HStack {
                     Text("バージョン")
+                        .bodyFont()
                     Spacer()
                     Text(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "")
                         .foregroundColor(.secondary)
