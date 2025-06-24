@@ -7,12 +7,14 @@ import UIKit
 
 struct FoodRegisterView: View {
     private let maxNameLength = AppConstants.maxFoodNameLength
+    let originalFood: Food?
+
     @State private var showPhotoPicker = false
     @State private var showCameraPicker = false
     @State private var selectedImage: UIImage?
-    @State private var foodName: String = ""
-    @State private var expireText: String = ""
-    @State private var note: String = ""
+    @State private var foodName: String
+    @State private var expireText: String
+    @State private var note: String
     @State private var showNameAlert = false
     @State private var showDateAlert = false
     @State private var showSavedAlert = false
@@ -22,9 +24,37 @@ struct FoodRegisterView: View {
     @State private var showPhotoPermissionAlert = false
     @State private var showLengthAlert = false
 
+    init(originalFood: Food? = nil) {
+        self.originalFood = originalFood
+        if let food = originalFood {
+            _foodName = State(initialValue: food.name)
+            _note = State(initialValue: food.note ?? "")
+            _expireText = State(initialValue: "")
+            if let data = Data(base64Encoded: food.imageUrl),
+               let uiImage = UIImage(data: data) {
+                _selectedImage = State(initialValue: uiImage)
+            } else {
+                _selectedImage = State(initialValue: nil)
+            }
+        } else {
+            _foodName = State(initialValue: "")
+            _note = State(initialValue: "")
+            _expireText = State(initialValue: "")
+            _selectedImage = State(initialValue: nil)
+        }
+    }
+
     var body: some View {
         NavigationView {
             VStack(spacing: 16) {
+                if originalFood != nil {
+                    Text("再登録モード")
+                        .font(.caption)
+                        .padding(4)
+                        .frame(maxWidth: .infinity)
+                        .background(Color.accentColor.opacity(0.1))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
                 HStack {
                     Button("写真撮影") {
                         checkCameraPermission()
