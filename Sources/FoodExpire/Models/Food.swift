@@ -6,5 +6,6 @@ struct Food: Identifiable, Codable {
     var name: String
     var imageUrl: String
     var expireDate: Date
+    var note: String?
 }
 

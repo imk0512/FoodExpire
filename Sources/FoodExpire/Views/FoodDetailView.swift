@@ -33,6 +33,24 @@ struct FoodDetailView: View {
                 DatePicker("賞味期限", selection: $viewModel.food.expireDate, displayedComponents: .date)
                     .datePickerStyle(.compact)
 
+                ZStack(alignment: .topLeading) {
+                    if (viewModel.food.note ?? "").isEmpty {
+                        Text("開封済み・使い道・保管方法など自由に記入")
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 8)
+                    }
+                    TextEditor(text: Binding(
+                        get: { viewModel.food.note ?? "" },
+                        set: { viewModel.food.note = $0 }
+                    ))
+                    .frame(height: 80)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.secondary.opacity(0.3))
+                    }
+                }
+
                 Button("更新") {
                     let trimmed = viewModel.food.name.trimmingCharacters(in: .whitespaces)
                     if trimmed.isEmpty {

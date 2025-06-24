@@ -12,6 +12,7 @@ struct FoodRegisterView: View {
     @State private var selectedImage: UIImage?
     @State private var foodName: String = ""
     @State private var expireText: String = ""
+    @State private var note: String = ""
     @State private var showNameAlert = false
     @State private var showDateAlert = false
     @State private var showSavedAlert = false
@@ -47,6 +48,21 @@ struct FoodRegisterView: View {
                 TextField("賞味期限(YYYY/MM/DD)", text: $expireText)
                     .textFieldStyle(.roundedBorder)
                     .keyboardType(.numbersAndPunctuation)
+
+                ZStack(alignment: .topLeading) {
+                    if note.isEmpty {
+                        Text("開封済み・使い道・保管方法など自由に記入")
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 8)
+                    }
+                    TextEditor(text: $note)
+                        .frame(height: 80)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.secondary.opacity(0.3))
+                        }
+                }
 
                 Button("保存") {
                     saveFood()
@@ -144,7 +160,8 @@ struct FoodRegisterView: View {
             "name": foodName,
             "expireDate": Timestamp(date: date),
             "createdAt": Timestamp(date: Date()),
-            "updatedAt": Timestamp(date: Date())
+            "updatedAt": Timestamp(date: Date()),
+            "note": note
         ]
         if let image = selectedImage, let imageData = image.jpegData(compressionQuality: 0.8) {
             data["imageUrl"] = imageData.base64EncodedString()
@@ -154,11 +171,12 @@ struct FoodRegisterView: View {
                 showSaveErrorAlert = true
                 return
             }
-            let newFood = Food(id: ref.documentID, name: foodName, imageUrl: data["imageUrl"] as? String ?? "", expireDate: date)
+            let newFood = Food(id: ref.documentID, name: foodName, imageUrl: data["imageUrl"] as? String ?? "", expireDate: date, note: note.isEmpty ? nil : note)
             NotificationManager.shared.scheduleNotification(for: newFood)
             foodName = ""
             expireText = ""
             selectedImage = nil
+            note = ""
             showSavedAlert = true
         }
     }
