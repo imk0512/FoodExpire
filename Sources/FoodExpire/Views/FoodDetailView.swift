@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseFirestore
 
 struct FoodDetailView: View {
     @Environment(\.dismiss) private var dismiss
@@ -12,6 +13,8 @@ struct FoodDetailView: View {
     @State private var showUpdateErrorAlert = false
     @State private var showDeleteErrorAlert = false
     @State private var showReRegister = false
+    @State private var showAddedAlert = false
+    @State private var showAddErrorAlert = false
     @EnvironmentObject private var userSettings: UserSettings
 
     init(food: Food) {
@@ -77,6 +80,11 @@ struct FoodDetailView: View {
                 }
                 .buttonStyle(.bordered)
 
+                Button("買い物リストに追加") {
+                    addToShoppingList()
+                }
+                .buttonStyle(.bordered)
+
                 Button("消費済み（削除）", role: .destructive) {
                     showDeleteAlert = true
                 }
@@ -114,8 +122,27 @@ struct FoodDetailView: View {
         .alert("更新しました", isPresented: $showUpdatedAlert) { Button("OK") { dismiss() } }
         .alert("更新に失敗しました", isPresented: $showUpdateErrorAlert) {}
         .alert("削除に失敗しました", isPresented: $showDeleteErrorAlert) {}
+        .alert("追加しました", isPresented: $showAddedAlert) {}
+        .alert("追加に失敗しました", isPresented: $showAddErrorAlert) {}
         .sheet(isPresented: $showReRegister) {
             AddFoodView(originalFood: viewModel.food)
+        }
+    }
+
+    private func addToShoppingList() {
+        let data: [String: Any] = [
+            "name": viewModel.food.name,
+            "createdAt": Timestamp(date: Date()),
+            "note": viewModel.food.note ?? "",
+            "storageType": "",
+            "isChecked": false
+        ]
+        Firestore.firestore().collection("shoppingList").addDocument(data: data) { error in
+            if error != nil {
+                showAddErrorAlert = true
+            } else {
+                showAddedAlert = true
+            }
         }
     }
 }
