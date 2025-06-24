@@ -10,8 +10,7 @@ struct RecipeSuggestionView: View {
                     .foregroundStyle(.secondary)
             } else {
                 Text(viewModel.recipeTitle)
-                    .font(.title2)
-                    .bold()
+                    .titleFont()
                 List(viewModel.suggestedFoods) { food in
                     HStack {
                         Text(food.name)
@@ -22,17 +21,18 @@ struct RecipeSuggestionView: View {
                     }
                 }
                 .listStyle(.plain)
+                .padding(.vertical, 8)
                 Button("使う") {
                     viewModel.useFoods()
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(PrimaryButtonStyle())
             }
             Button("別の提案を見る") {
                 viewModel.generateRecipe()
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(PrimaryButtonStyle())
         }
-        .padding()
+        .padding(.vertical, 8)
         .navigationTitle("レシピ提案")
         .onAppear { viewModel.fetchFoods() }
         .alert("データの取得に失敗しました", isPresented: $viewModel.fetchError) {}

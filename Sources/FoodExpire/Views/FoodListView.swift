@@ -17,6 +17,7 @@ struct FoodListView: View {
                 }
             }
             .listStyle(.plain)
+            .padding(.vertical, 8)
             .navigationTitle("食品一覧")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
