@@ -3,6 +3,7 @@ import SwiftUI
 struct FoodListView: View {
     @StateObject private var viewModel = FoodListViewModel()
     @State private var showAdd = false
+    @State private var showSettings = false
     @EnvironmentObject private var userSettings: UserSettings
 
     var body: some View {
@@ -17,6 +18,11 @@ struct FoodListView: View {
             .listStyle(.plain)
             .navigationTitle("食品一覧")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: { showSettings = true }) {
+                        Image(systemName: "gear")
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showAdd = true }) {
                         Image(systemName: "plus")
@@ -26,6 +32,10 @@ struct FoodListView: View {
             .onAppear { viewModel.fetchFoods() }
             .sheet(isPresented: $showAdd) {
                 AddFoodView()
+            }
+            .sheet(isPresented: $showSettings) {
+                NavigationStack { SettingsView() }
+                    .environmentObject(userSettings)
             }
             .safeAreaInset(edge: .bottom) {
                 if !userSettings.isPremium {
