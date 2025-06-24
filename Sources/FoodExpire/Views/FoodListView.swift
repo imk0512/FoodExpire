@@ -7,7 +7,11 @@ struct FoodListView: View {
     var body: some View {
         NavigationStack {
             List(viewModel.foods) { food in
-                FoodCardView(food: food)
+                NavigationLink {
+                    FoodDetailView(food: food)
+                } label: {
+                    FoodCardView(food: food)
+                }
             }
             .listStyle(.plain)
             .navigationTitle("食品一覧")
