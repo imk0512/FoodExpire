@@ -11,6 +11,7 @@ struct FoodDetailView: View {
     @State private var showDeletedAlert = false
     @State private var showUpdateErrorAlert = false
     @State private var showDeleteErrorAlert = false
+    @State private var showReRegister = false
     @EnvironmentObject private var userSettings: UserSettings
 
     init(food: Food) {
@@ -71,6 +72,11 @@ struct FoodDetailView: View {
                 }
                 .buttonStyle(.borderedProminent)
 
+                Button("再登録") {
+                    showReRegister = true
+                }
+                .buttonStyle(.bordered)
+
                 Button("消費済み（削除）", role: .destructive) {
                     showDeleteAlert = true
                 }
@@ -108,6 +114,9 @@ struct FoodDetailView: View {
         .alert("更新しました", isPresented: $showUpdatedAlert) { Button("OK") { dismiss() } }
         .alert("更新に失敗しました", isPresented: $showUpdateErrorAlert) {}
         .alert("削除に失敗しました", isPresented: $showDeleteErrorAlert) {}
+        .sheet(isPresented: $showReRegister) {
+            AddFoodView(originalFood: viewModel.food)
+        }
     }
 }
 

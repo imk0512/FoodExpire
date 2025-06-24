@@ -12,6 +12,7 @@ The app supports both Japanese and English localizations.
 - Save food items with expiration dates to Firestore.
 - List saved items sorted by expiration date.
 - Send notifications when items are about to expire.
+- Re-register previously saved foods from the detail screen.
 - Optional in-app purchase to remove banner ads.
 
 ## Setup
