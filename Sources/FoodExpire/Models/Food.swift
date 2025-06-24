@@ -7,5 +7,6 @@ struct Food: Identifiable, Codable {
     var imageUrl: String
     var expireDate: Date
     var note: String?
+    var storageType: StorageType = .fridge
 }
 

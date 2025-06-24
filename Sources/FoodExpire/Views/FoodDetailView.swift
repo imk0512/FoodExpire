@@ -37,6 +37,13 @@ struct FoodDetailView: View {
                 DatePicker("賞味期限", selection: $viewModel.food.expireDate, displayedComponents: .date)
                     .datePickerStyle(.compact)
 
+                Picker("保存場所", selection: $viewModel.food.storageType) {
+                    ForEach(StorageType.allCases) { type in
+                        Text(type.rawValue).tag(type)
+                    }
+                }
+                .pickerStyle(.segmented)
+
                 ZStack(alignment: .topLeading) {
                     if (viewModel.food.note ?? "").isEmpty {
                         Text("開封済み・使い道・保管方法など自由に記入")
@@ -134,7 +141,7 @@ struct FoodDetailView: View {
             "name": viewModel.food.name,
             "createdAt": Timestamp(date: Date()),
             "note": viewModel.food.note ?? "",
-            "storageType": "",
+            "storageType": viewModel.food.storageType.rawValue,
             "isChecked": false
         ]
         Firestore.firestore().collection("shoppingList").addDocument(data: data) { error in
@@ -148,6 +155,6 @@ struct FoodDetailView: View {
 }
 
 #Preview {
-    FoodDetailView(food: Food(id: "1", name: "Sample", imageUrl: "", expireDate: Date()))
+    FoodDetailView(food: Food(id: "1", name: "Sample", imageUrl: "", expireDate: Date(), storageType: .fridge))
         .environmentObject(UserSettings())
 }

@@ -15,6 +15,7 @@ struct FoodRegisterView: View {
     @State private var foodName: String
     @State private var expireText: String
     @State private var note: String
+    @State private var storageType: StorageType
     @State private var showNameAlert = false
     @State private var showDateAlert = false
     @State private var showSavedAlert = false
@@ -30,6 +31,7 @@ struct FoodRegisterView: View {
             _foodName = State(initialValue: food.name)
             _note = State(initialValue: food.note ?? "")
             _expireText = State(initialValue: "")
+            _storageType = State(initialValue: food.storageType)
             if let data = Data(base64Encoded: food.imageUrl),
                let uiImage = UIImage(data: data) {
                 _selectedImage = State(initialValue: uiImage)
@@ -41,6 +43,7 @@ struct FoodRegisterView: View {
             _note = State(initialValue: "")
             _expireText = State(initialValue: "")
             _selectedImage = State(initialValue: nil)
+            _storageType = State(initialValue: .fridge)
         }
     }
 
@@ -78,6 +81,13 @@ struct FoodRegisterView: View {
                 TextField("賞味期限(YYYY/MM/DD)", text: $expireText)
                     .textFieldStyle(.roundedBorder)
                     .keyboardType(.numbersAndPunctuation)
+
+                Picker("保存場所", selection: $storageType) {
+                    ForEach(StorageType.allCases) { type in
+                        Text(type.rawValue).tag(type)
+                    }
+                }
+                .pickerStyle(.segmented)
 
                 ZStack(alignment: .topLeading) {
                     if note.isEmpty {
@@ -191,7 +201,8 @@ struct FoodRegisterView: View {
             "expireDate": Timestamp(date: date),
             "createdAt": Timestamp(date: Date()),
             "updatedAt": Timestamp(date: Date()),
-            "note": note
+            "note": note,
+            "storageType": storageType.rawValue
         ]
         if let image = selectedImage, let imageData = image.jpegData(compressionQuality: 0.8) {
             data["imageUrl"] = imageData.base64EncodedString()
@@ -201,12 +212,13 @@ struct FoodRegisterView: View {
                 showSaveErrorAlert = true
                 return
             }
-            let newFood = Food(id: ref.documentID, name: foodName, imageUrl: data["imageUrl"] as? String ?? "", expireDate: date, note: note.isEmpty ? nil : note)
+            let newFood = Food(id: ref.documentID, name: foodName, imageUrl: data["imageUrl"] as? String ?? "", expireDate: date, note: note.isEmpty ? nil : note, storageType: storageType)
             NotificationManager.shared.scheduleNotification(for: newFood)
             foodName = ""
             expireText = ""
             selectedImage = nil
             note = ""
+            storageType = .fridge
             showSavedAlert = true
         }
     }

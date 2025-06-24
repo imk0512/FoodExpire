@@ -4,19 +4,35 @@ struct FoodListView: View {
     @StateObject private var viewModel = FoodListViewModel()
     @State private var showAdd = false
     @State private var showSettings = false
+    @State private var filter: StorageType?
     @EnvironmentObject private var userSettings: UserSettings
     @EnvironmentObject private var notificationManager: NotificationManager
 
+    private var displayedFoods: [Food] {
+        if let filter { return viewModel.foods.filter { $0.storageType == filter } }
+        return viewModel.foods
+    }
+
     var body: some View {
         NavigationStack {
-            List(viewModel.foods) { food in
-                NavigationLink {
-                    FoodDetailView(food: food)
-                } label: {
-                    FoodCardView(food: food)
+            VStack {
+                Picker("保存場所", selection: $filter) {
+                    Text("すべて").tag(StorageType?.none)
+                    ForEach(StorageType.allCases) { type in
+                        Text(type.rawValue).tag(Optional(type))
+                    }
                 }
+                .pickerStyle(.segmented)
+
+                List(displayedFoods) { food in
+                    NavigationLink {
+                        FoodDetailView(food: food)
+                    } label: {
+                        FoodCardView(food: food)
+                    }
+                }
+                .listStyle(.plain)
             }
-            .listStyle(.plain)
             .navigationTitle("食品一覧")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

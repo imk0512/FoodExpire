@@ -30,8 +30,14 @@ struct FoodCardView: View {
             .clipShape(RoundedRectangle(cornerRadius: 8))
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(food.name)
-                    .font(.headline)
+                HStack {
+                    Text(food.name)
+                        .font(.headline)
+                    Spacer()
+                    Text(food.storageType.rawValue)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
                 Text(dateString)
                     .font(.subheadline)
                 Text("残り\(remainingDays)日")
@@ -50,6 +56,6 @@ struct FoodCardView: View {
 }
 
 #Preview {
-    FoodCardView(food: Food(id: "1", name: "Sample", imageUrl: "", expireDate: Date().addingTimeInterval(86400*5)))
+    FoodCardView(food: Food(id: "1", name: "Sample", imageUrl: "", expireDate: Date().addingTimeInterval(86400*5), storageType: .fridge))
 }
 
